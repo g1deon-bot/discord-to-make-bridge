@@ -1,0 +1,13 @@
+{
+  "name": "discord-to-make",
+  "version": "1.0.0",
+  "description": "Bridge Discord to Make",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.13.0",
+    "axios": "^1.5.0"
+  }
+}
