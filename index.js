@@ -1,7 +1,15 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const axios = require('axios');
+const http = require('http');
 
-// On utilise des variables d'environnement pour la sécurité
+// 1. PETIT SERVEUR POUR RÉPONDRE À CRON-JOB
+// Cela permet à Render de voir que ton bot est "actif" sur le web
+http.createServer((req, res) => {
+    res.write("I am alive and watching Discord!");
+    res.end();
+}).listen(8080); 
+
+// 2. CONFIGURATION DU BOT DISCORD
 const client = new Client({ 
     intents: [
         GatewayIntentBits.Guilds, 
@@ -13,24 +21,19 @@ const client = new Client({
 const MAKE_WEBHOOK_URL = process.env.MAKE_WEBHOOK_URL;
 
 client.on('messageCreate', async (message) => {
-    // 1. On ignore les messages des bots (pour éviter les boucles infinies)
     if (message.author.bot) return;
 
-    // 2. On vérifie si c'est un forum ou un message texte (optionnel : tu peux filtrer ici)
     console.log(`Nouveau message de ${message.author.username}: ${message.content}`);
 
     try {
-        // 3. Envoi instantané vers Make
         await axios.post(MAKE_WEBHOOK_URL, {
             content: message.content,
             author: message.author.username,
-            channelId: message.channelId,
             channelName: message.channel.name,
-            timestamp: message.createdAt,
-            messageId: message.id
+            timestamp: message.createdAt
         });
     } catch (error) {
-        console.error("Erreur lors de l'envoi vers Make:", error.message);
+        console.error("Erreur Make:", error.message);
     }
 });
 
